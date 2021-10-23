@@ -287,40 +287,47 @@ pair<vector<int>, int> TSP_held_karp()
             }
         }
     }
-    for (int i = 1; i < number_of_current_graph_vertices; i++)
-    {
-        int local_min_cost = INT_MAX;
-        int parent = 0;
-        int prev_cost = 0;
+    // for (int i = 1; i < number_of_current_graph_vertices; i++)
+    // {
+        int final_local_min_cost = INT_MAX;
+        int final_parent = 0;
         for (auto &element : map_of_costs_and_parents)
         {
             if (get<0>(element).second.size() == number_of_current_graph_vertices - 2)
             {
-                int cost = get<1>(element) + current_graph_adjacency_matrix.matrix[i][0];
-                if (cost < local_min_cost)
+                int cost = get<1>(element) + current_graph_adjacency_matrix.matrix[get<0>(element).first][0];
+                if (cost < final_local_min_cost)
                 {
-                    local_min_cost = cost;
-                    parent = i;
+                    final_local_min_cost = cost;
+                    final_parent = get<0>(element).first;
                 }
             }
         }
-        map_of_costs_and_parents.push_back(make_tuple(make_pair(0, subsets[subsets.size() - 1]), local_min_cost, parent));
+        map_of_costs_and_parents.push_back(make_tuple(make_pair(0, subsets[subsets.size() - 1]), final_local_min_cost, final_parent));
 
         // map_of_costs_and_parents.push_back(make_tuple(make_pair(0, subsets[subsets.size()-1]), local_min_cost, parent))
-    }
+    // }
     path.push_back(0);
     for (int i = 5; i > 0; i--)
     {
+        int local_min_cost = INT_MAX;
+        int parent_with_min_cost = 0;
         for (auto &element : map_of_costs_and_parents)
         {
             if (get<0>(element).second.size() == i && get<0>(element).first == path[path.size() - 1])
             {
-                path.push_back(get<2>(element));
+                if (get<1>(element) < local_min_cost)
+                {
+                    local_min_cost = get<1>(element);
+                    parent_with_min_cost = get<2>(element);
+                }
             }
         }
+        path.push_back(parent_with_min_cost);
     }
     path.push_back(0);
     int weight = get<1>(map_of_costs_and_parents[map_of_costs_and_parents.size() - 1]);
+    reverse(path.begin(),path.end());
     return make_pair(path, weight);
 }
 int main()
