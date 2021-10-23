@@ -15,6 +15,7 @@
 #include <cctype>
 #include <locale>
 #include <tuple>
+#include <unordered_set>
 #include "structures.h"
 using namespace std;
 using namespace std::chrono;
@@ -237,14 +238,91 @@ vector<vector<int>> generate_subsets(int n)
     return subsets;
 }
 
-vector<int> TSP_held_karp()
+pair<vector<int>, int> TSP_held_karp()
 {
-    vector<vector<int>> subsets = generate_subsets(number_of_current_graph_vertices);
-    for (int i = 0; i < subsets.size(); i++)
+    vector<vector<int>> subsets = generate_subsets(number_of_current_graph_vertices - 1);
+    vector<tuple<pair<int, vector<int>>, int, int>> map_of_costs_and_parents;
+    vector<int> path;
+    for (int i = 0; i < subsets.size(); i++) // i numer zbioru
     {
+        for (int j = 1; j < number_of_current_graph_vertices; j++) // j numer wierzchołka w grafie (do którego idziemy) wybrany z podzbioru
+        {
+            vector<int>::iterator it = std::find(subsets[i].begin(), subsets[i].end(), j);
+            if (it == subsets[i].end())
+            {
+                int local_min_cost = INT_MAX;
+                int parent = 0;
+                for (int k = 0; k < subsets[i].size(); k++)
+                { // k numer elementu w bieżąco analizowanym zbiorze
+                    int prev_cost = 0;
+                    for (auto &element : map_of_costs_and_parents)
+                    {
+                        // if(get<0>(element).first == j && get<0>(element).second == subsets[i]){
+                        //znajdź koszt poprzednika
+                        vector<int> prev_subset = subsets[i];
+                        prev_subset.erase(remove(prev_subset.begin(), prev_subset.end(), subsets[i][k]));
+                        bool subsets_comparsion = std::equal(get<0>(element).second.begin(), get<0>(element).second.end(), prev_subset.begin(), prev_subset.end());
+                        if (get<0>(element).first == subsets[i][k] && subsets_comparsion)
+                        {
+                            prev_cost = get<1>(element);
+                            break;
+                        }
+                    }
+                    // if(prev_cost == INT_MAX){
+                    //     prev_cost = current_graph_adjacency_matrix.matrix[0][j];
+                    // }
+                    // vector<int>::iterator it_cost = std::find(map_of_costs_and_parents[i].begin(), subsets[i].end(), );
+                    int cost = current_graph_adjacency_matrix.matrix[subsets[i][k]][j] + prev_cost;
+                    if (cost < local_min_cost)
+                    {
+                        local_min_cost = cost;
+                        parent = subsets[i][k];
+                    }
+                }
+                if (local_min_cost == INT_MAX)
+                {
+                    local_min_cost = current_graph_adjacency_matrix.matrix[0][j];
+                }
+                map_of_costs_and_parents.push_back(make_tuple(make_pair(j, subsets[i]), local_min_cost, parent));
+            }
+        }
     }
-}
+    for (int i = 1; i < number_of_current_graph_vertices; i++)
+    {
+        int local_min_cost = INT_MAX;
+        int parent = 0;
+        int prev_cost = 0;
+        for (auto &element : map_of_costs_and_parents)
+        {
+            if (get<0>(element).second.size() == number_of_current_graph_vertices - 2)
+            {
+                int cost = get<1>(element) + current_graph_adjacency_matrix.matrix[i][0];
+                if (cost < local_min_cost)
+                {
+                    local_min_cost = cost;
+                    parent = i;
+                }
+            }
+        }
+        map_of_costs_and_parents.push_back(make_tuple(make_pair(0, subsets[subsets.size() - 1]), local_min_cost, parent));
 
+        // map_of_costs_and_parents.push_back(make_tuple(make_pair(0, subsets[subsets.size()-1]), local_min_cost, parent))
+    }
+    path.push_back(0);
+    for (int i = 5; i > 0; i--)
+    {
+        for (auto &element : map_of_costs_and_parents)
+        {
+            if (get<0>(element).second.size() == i && get<0>(element).first == path[path.size() - 1])
+            {
+                path.push_back(get<2>(element));
+            }
+        }
+    }
+    path.push_back(0);
+    int weight = get<1>(map_of_costs_and_parents[map_of_costs_and_parents.size() - 1]);
+    return make_pair(path, weight);
+}
 int main()
 {
     load_config();
@@ -283,7 +361,7 @@ int main()
                 high_resolution_clock::time_point t_start = high_resolution_clock::now();
                 for (int j = 0; j < number_of_repeats; j++)
                 {
-                    answer = TSP_held_karp();
+                    TSP_held_karp();
                 }
                 high_resolution_clock::time_point t_end = high_resolution_clock::now();
                 duration<double> time_span = duration_cast<duration<double>>(t_end - t_start);
