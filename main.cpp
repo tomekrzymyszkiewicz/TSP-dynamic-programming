@@ -364,19 +364,18 @@ int main()
             }
             else
             {
-                vector<int> answer;
+                pair<vector<int>, int> answer;
                 high_resolution_clock::time_point t_start = high_resolution_clock::now();
                 for (int j = 0; j < number_of_repeats; j++)
                 {
-                    TSP_held_karp();
+                    answer = TSP_held_karp();
                 }
                 high_resolution_clock::time_point t_end = high_resolution_clock::now();
                 duration<double> time_span = duration_cast<duration<double>>(t_end - t_start);
-                int weight = answer[answer.size() - 1];
+                int weight = answer.second;
                 string path = "";
-                answer.pop_back();
-                std::vector<int>::iterator it = answer.begin();
-                while (it != answer.end())
+                std::vector<int>::iterator it = answer.first.begin();
+                while (it != answer.first.end())
                 {
                     path += to_string(*it);
                     path += " ";
