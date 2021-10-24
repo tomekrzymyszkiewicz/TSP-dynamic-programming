@@ -190,23 +190,6 @@ void load_config()
     return;
 }
 
-// vector<int> TSP_held_karp()
-// {
-//     vector<vector<tuple<int,int*,int>>> mem;
-//     vector<tuple<int,int*,int>> start_set;
-//     for (int i = 1; i < number_of_current_graph_vertices; i++)
-//     {
-//         tuple<int,int*,int> current_quantity = make_tuple(i,nullptr,current_graph_adjacency_matrix.matrix[0][i]);
-//         start_set.push_back(current_quantity);
-//     }
-//     mem.push_back(start_set);
-//     for(int i = 1; i < number_of_current_graph_vertices-1; i++){ //iteracji o 1 mniej niż wierzchołków zaczynając od drugiego // liczba i-kombinacji podzbiorów n
-//         vector<tuple<int,int*,int>> current_set;
-//         for(int j = 1; j < number_of_current_graph_vertices; j++){
-
-//         }
-//     }
-// }
 void generate(int k, vector<bool> &my_set, int N, vector<vector<int>> &current_subsets)
 {
     if (k == N)
@@ -257,7 +240,6 @@ pair<vector<int>, int> TSP_held_karp()
                     int prev_cost = 0;
                     for (auto &element : map_of_costs_and_parents)
                     {
-                        // if(get<0>(element).first == j && get<0>(element).second == subsets[i]){
                         //znajdź koszt poprzednika
                         vector<int> prev_subset = subsets[i];
                         prev_subset.erase(remove(prev_subset.begin(), prev_subset.end(), subsets[i][k]));
@@ -268,10 +250,6 @@ pair<vector<int>, int> TSP_held_karp()
                             break;
                         }
                     }
-                    // if(prev_cost == INT_MAX){
-                    //     prev_cost = current_graph_adjacency_matrix.matrix[0][j];
-                    // }
-                    // vector<int>::iterator it_cost = std::find(map_of_costs_and_parents[i].begin(), subsets[i].end(), );
                     int cost = current_graph_adjacency_matrix.matrix[subsets[i][k]][j] + prev_cost;
                     if (cost < local_min_cost)
                     {
@@ -287,8 +265,6 @@ pair<vector<int>, int> TSP_held_karp()
             }
         }
     }
-    // for (int i = 1; i < number_of_current_graph_vertices; i++)
-    // {
         int final_local_min_cost = INT_MAX;
         int final_parent = 0;
         for (auto &element : map_of_costs_and_parents)
@@ -304,9 +280,6 @@ pair<vector<int>, int> TSP_held_karp()
             }
         }
         map_of_costs_and_parents.push_back(make_tuple(make_pair(0, subsets[subsets.size() - 1]), final_local_min_cost, final_parent));
-
-        // map_of_costs_and_parents.push_back(make_tuple(make_pair(0, subsets[subsets.size()-1]), local_min_cost, parent))
-    // }
     path.push_back(0);
     for (int i = 5; i > 0; i--)
     {
