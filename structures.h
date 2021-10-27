@@ -27,7 +27,7 @@ struct adjacency_matrix{
         }
         printf("\n----");
         for(int i = 0; i < this->number_of_vertices; i++){
-            printf("----", i);
+            printf("----");
         }
         printf("\n");
         for(int i = 0; i < this->number_of_vertices; i++){
