@@ -5,11 +5,12 @@
 #include <queue>
 #include <chrono>
 #include <vector>
-#include <conio.h>
+// #include <conio.h>
 #include <random>
 #include <string>
-#include <windows.h>
+// #include <windows.h>
 #include <sstream>
+#include <climits>
 #include <iterator>
 #include <algorithm>
 #include <cctype>
@@ -239,6 +240,7 @@ int *solve_combination(int finish, unsigned long long node_set)
                     solved_combinations[0] = cost;
                     solved_combinations[1] = i + 1;
                 }
+                delete current_solve;
             }
         }
         return solved_combinations;
@@ -331,6 +333,6 @@ int main()
     std::cout << endl;
     save_results(results_file_name);
     std::cout << "Press any key to continue...";
-    getch();
+    getchar();
     return 0;
 }
