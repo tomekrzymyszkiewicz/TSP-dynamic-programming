@@ -56,7 +56,7 @@ void save_results(string results_file_name)
     fstream fout;
     fout.open(results_file_name, ios::out);
     fout << "graph_name,path,path_weight,time,number_of_repeats" << endl;
-    for (int i = 0; i < results.size(); i++)
+    for (long unsigned int i = 0; i < results.size(); i++)
     {
         fout << results[i] << endl;
     }
@@ -132,7 +132,7 @@ bool load_data(string file_name)
                 ++it;
             }
         }
-        for (int j = 0; j < single_line.size(); j++)
+        for (long unsigned int j = 0; j < single_line.size(); j++)
         {
             ltrim(single_line[j]);
             rtrim(single_line[j]);
@@ -169,7 +169,7 @@ void load_config()
             test_type = single_line[1];
             number_of_repeats = single_line[2];
             shortest_path_weight = single_line[3];
-            for (int i = 4; i < single_line.size(); i++)
+            for (long unsigned int i = 4; i < single_line.size(); i++)
             {
                 shortest_path += single_line[i];
                 shortest_path += " ";
@@ -223,12 +223,11 @@ int *solve_combination(int finish, unsigned long long node_set)
     }
     else
     {
-        int node_set_quantity = countSetBits(node_set);
         int *solved_combinations = new int[3]; //local min / parent / finish
         solved_combinations[0] = INT_MAX; // local min
         solved_combinations[1] = 0; // local_min_parent;
         solved_combinations[2] = finish;
-        for (int i = 0; i < sizeof(node_set) * 8; i++)
+        for (long unsigned int i = 0; i < sizeof(node_set) * 8; i++)
         {
             if (1 & (node_set >> i)) // czy i nie należy do node_set
             {
@@ -276,7 +275,7 @@ int main()
     }
     else
     {
-        for (int i = 0; i < tasks.size(); i++)
+        for (long unsigned int i = 0; i < tasks.size(); i++)
         {
             std::cout << endl
                       << "##################################################" << endl
