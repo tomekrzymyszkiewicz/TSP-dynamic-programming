@@ -26,6 +26,7 @@ string results_file_name = "";
 int number_of_current_graph_vertices = 0;
 adjacency_matrix current_graph_adjacency_matrix = adjacency_matrix();
 int *path_array;
+int ***solved_subproblems;
 
 struct Result
 {
@@ -209,36 +210,42 @@ int fact(int x)
 
 int *solve_combination(int finish, unsigned long long node_set)
 {
-    if (node_set == 0)
+    if (solved_subproblems[finish][node_set][0] != INT_MAX)
     {
-        int *solved_combinations = new int[3];
-        solved_combinations[0] = current_graph_adjacency_matrix.matrix[0][finish];
-        solved_combinations[1] = 0;
-        solved_combinations[2] = finish;
-        return solved_combinations;
+        // int *solved_combinations = new int[3];
+        // solved_combinations[0] = current_graph_adjacency_matrix.matrix[0][finish];
+        // solved_combinations[1] = 0;
+        // solved_combinations[2] = finish;
+        return solved_subproblems[finish][node_set];
     }
-    else
+    else if(node_set == 0){
+        solved_subproblems[finish][node_set][0] = current_graph_adjacency_matrix.matrix[0][finish];
+        solved_subproblems[finish][node_set][1] = 0;
+        solved_subproblems[finish][node_set][2] = finish;
+        return solved_subproblems[finish][node_set];
+    }else
     {
-        int *solved_combinations = new int[3]; //local min / parent / finish
-        solved_combinations[0] = INT_MAX;      // local min
-        solved_combinations[1] = 0;            // local_min_parent;
-        solved_combinations[2] = finish;
+        // int *solved_combinations = new int[3]; //local min / parent / finish
+        // solved_combinations[0] = INT_MAX;      // local min
+        // solved_combinations[1] = 0;            // local_min_parent;
+        // solved_combinations[2] = finish;
         for (long unsigned int i = 0; i < sizeof(node_set) * 8; i++)
         {
             if (1 & (node_set >> i)) // czy i nie należy do node_set
             {
                 unsigned long long current_node_set = node_set & (~(1 << i));
-                int *current_solve = solve_combination(i + 1, current_node_set);
-                int cost = current_graph_adjacency_matrix.matrix[i + 1][finish] + current_solve[0];
-                if (cost < solved_combinations[0])
+                solved_subproblems[i + 1][current_node_set] = solve_combination(i + 1, current_node_set);
+                // int *current_solve = solve_combination(i + 1, current_node_set);
+                int cost = current_graph_adjacency_matrix.matrix[i + 1][finish] + solved_subproblems[i + 1][current_node_set][0];
+                if (cost < solved_subproblems[finish][node_set][0])
                 {
-                    solved_combinations[0] = cost;
-                    solved_combinations[1] = i + 1;
+                    solved_subproblems[finish][node_set][0] = cost;
+                    solved_subproblems[finish][node_set][1] = i + 1;
                 }
-                delete current_solve;
+                // delete current_solve;
             }
         }
-        return solved_combinations; // cost, parent, final vertex
+        return solved_subproblems[finish][node_set]; // cost, parent, final vertex
     }
 }
 
@@ -246,8 +253,17 @@ pair<vector<int>, int> TSP_held_karp()
 {
     vector<int> path;
     int weight;
+    int number_of_combinations = pow(2, number_of_current_graph_vertices - 1);
+    solved_subproblems = new int**[number_of_current_graph_vertices];
+    for(int i = 0; i <number_of_current_graph_vertices; i++){
+        solved_subproblems[i] = new int*[number_of_combinations];
+        for(int j = 0; j < number_of_combinations; j++){
+            solved_subproblems[i][j] = new int[3]();
+            solved_subproblems[i][j][0] = INT_MAX;
+        }
+    }
     unsigned long long node_set;
-    node_set = pow(2, number_of_current_graph_vertices - 1) - 1;
+    node_set = number_of_combinations - 1;
     int *solve = solve_combination(0, node_set);
     weight = solve[0];
     path.push_back(0);
