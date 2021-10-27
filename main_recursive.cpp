@@ -26,6 +26,7 @@ vector<string> results;
 string results_file_name = "";
 int number_of_current_graph_vertices = 0;
 adjacency_matrix current_graph_adjacency_matrix = adjacency_matrix();
+int *path_array;
 
 struct Result
 {
@@ -191,37 +192,6 @@ void load_config()
     return;
 }
 
-void generate(int k, vector<bool> &my_set, int N, vector<vector<int>> &current_subsets)
-{
-    if (k == N)
-    {
-        vector<int> current_subset;
-        for (int i = 0; i < N; i++)
-        {
-            if (my_set[i] == true)
-                current_subset.push_back(i + 1);
-        }
-        current_subsets.push_back(current_subset);
-    }
-    else
-    {
-        my_set[k] = true;
-        generate(k + 1, my_set, N, current_subsets);
-        my_set[k] = false;
-        generate(k + 1, my_set, N, current_subsets);
-    }
-}
-
-vector<vector<int>> generate_subsets(int n)
-{
-    vector<vector<int>> subsets;
-    vector<bool> my_set(n);
-    generate(0, my_set, n, subsets);
-    std::sort(subsets.begin(), subsets.end(), [](const vector<int> &a, const vector<int> &b)
-              { return a.size() < b.size(); });
-    return subsets;
-}
-
 unsigned int countSetBits(unsigned int n)
 {
     unsigned int count = 0;
@@ -253,7 +223,7 @@ int *solve_combination(int finish, unsigned long long node_set)
     else
     {
         int node_set_quantity = countSetBits(node_set);
-        int *solved_combinations = new int[3 + node_set_quantity]; //local min / parent / finish
+        int *solved_combinations = new int[3]; //local min / parent / finish
         solved_combinations[0] = INT_MAX; // local min
         solved_combinations[1] = 0; // local_min_parent;
         solved_combinations[2] = finish;
@@ -262,7 +232,8 @@ int *solve_combination(int finish, unsigned long long node_set)
             if (1 & (node_set >> i)) // czy i nie należy do node_set
             {
                 unsigned long long current_node_set = node_set & (~(1 << i));
-                int cost = current_graph_adjacency_matrix.matrix[i + 1][finish] + solve_combination(i + 1, current_node_set)[0];
+                int* current_solve = solve_combination(i + 1, current_node_set);
+                int cost = current_graph_adjacency_matrix.matrix[i + 1][finish] + current_solve[0];
                 if (cost < solved_combinations[0])
                 {
                     solved_combinations[0] = cost;
@@ -283,7 +254,15 @@ pair<vector<int>, int> TSP_held_karp()
     node_set = pow(2, number_of_current_graph_vertices - 1) - 1;
     int *solve = solve_combination(0, node_set);
     weight = solve[0];
-
+    path.push_back(0);
+    int *temp_solve = solve;
+    unsigned long long temp_node_set = node_set;
+    for(int i = 0; i < number_of_current_graph_vertices; i++){
+        path.push_back(temp_solve[1]);
+        temp_node_set = temp_node_set & (~(1 << (temp_solve[1]-1)));
+        temp_solve = solve_combination(temp_solve[1], temp_node_set);
+    }
+    std::reverse(path.begin(), path.end());
     return make_pair(path, weight);
 }
 int main()
