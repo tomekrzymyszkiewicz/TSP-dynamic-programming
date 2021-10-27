@@ -284,23 +284,22 @@ pair<vector<int>, int> TSP_held_karp()
                 {
                     local_min_cost = current_graph_adjacency_matrix.matrix[0][j];
                 }
-                if (i == 16)
-                    cout << "";
                 map_of_costs_and_parents.push_back(make_tuple(make_pair(j, subsets[i]), local_min_cost, parent));
             }
         }
     }
     int final_local_min_cost = INT_MAX;
     int final_parent = 0;
-    for (auto &element : map_of_costs_and_parents)
+    // for (auto &element : map_of_costs_and_parents)
+    for (vector<tuple<pair<int, vector<int>>, int, int>>::iterator it = map_of_costs_and_parents.begin() + map_of_costs_and_parents.size() - number_of_current_graph_vertices + 1; it != map_of_costs_and_parents.end(); ++it)
     {
-        if (get<0>(element).second.size() == number_of_current_graph_vertices - 2)
+        if (get<0>(*it).second.size() == number_of_current_graph_vertices - 2)
         {
-            int cost = get<1>(element) + current_graph_adjacency_matrix.matrix[get<0>(element).first][0];
+            int cost = get<1>(*it) + current_graph_adjacency_matrix.matrix[get<0>(*it).first][0];
             if (cost < final_local_min_cost)
             {
                 final_local_min_cost = cost;
-                final_parent = get<0>(element).first;
+                final_parent = get<0>(*it).first;
             }
         }
     }
