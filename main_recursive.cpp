@@ -212,10 +212,6 @@ int *solve_combination(int finish, unsigned long long node_set)
 {
     if (solved_subproblems[finish][node_set][0] != INT_MAX)
     {
-        // int *solved_combinations = new int[3];
-        // solved_combinations[0] = current_graph_adjacency_matrix.matrix[0][finish];
-        // solved_combinations[1] = 0;
-        // solved_combinations[2] = finish;
         return solved_subproblems[finish][node_set];
     }
     else if(node_set == 0){
@@ -225,24 +221,18 @@ int *solve_combination(int finish, unsigned long long node_set)
         return solved_subproblems[finish][node_set];
     }else
     {
-        // int *solved_combinations = new int[3]; //local min / parent / finish
-        // solved_combinations[0] = INT_MAX;      // local min
-        // solved_combinations[1] = 0;            // local_min_parent;
-        // solved_combinations[2] = finish;
         for (long unsigned int i = 0; i < sizeof(node_set) * 8; i++)
         {
             if (1 & (node_set >> i)) // czy i nie należy do node_set
             {
                 unsigned long long current_node_set = node_set & (~(1 << i));
                 solved_subproblems[i + 1][current_node_set] = solve_combination(i + 1, current_node_set);
-                // int *current_solve = solve_combination(i + 1, current_node_set);
                 int cost = current_graph_adjacency_matrix.matrix[i + 1][finish] + solved_subproblems[i + 1][current_node_set][0];
                 if (cost < solved_subproblems[finish][node_set][0])
                 {
                     solved_subproblems[finish][node_set][0] = cost;
                     solved_subproblems[finish][node_set][1] = i + 1;
                 }
-                // delete current_solve;
             }
         }
         return solved_subproblems[finish][node_set]; // cost, parent, final vertex
@@ -275,9 +265,17 @@ pair<vector<int>, int> TSP_held_karp()
         temp_node_set = temp_node_set & (~(1 << (temp_solve[1] - 1)));
         temp_solve = solve_combination(temp_solve[1], temp_node_set);
     }
+    for(int i = 0; i <number_of_current_graph_vertices; i++){
+        for(int j = 0; j < number_of_combinations; j++){
+            delete solved_subproblems[i][j];
+        }
+        delete solved_subproblems[i];
+    }
+    delete solved_subproblems;
     std::reverse(path.begin(), path.end());
     return make_pair(path, weight);
 }
+
 int main()
 {
     load_config();
