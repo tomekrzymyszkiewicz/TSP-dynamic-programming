@@ -217,13 +217,12 @@ int *solve_combination(int finish, unsigned long long node_set)
     else if(node_set == 0){
         solved_subproblems[finish][node_set][0] = current_graph_adjacency_matrix.matrix[0][finish];
         solved_subproblems[finish][node_set][1] = 0;
-        solved_subproblems[finish][node_set][2] = finish;
         return solved_subproblems[finish][node_set];
     }else
     {
         for (long unsigned int i = 0; i < sizeof(node_set) * 8; i++)
         {
-            if (1 & (node_set >> i)) // czy i nie należy do node_set
+            if (1 & (node_set >> i)) // node_set contains i?
             {
                 unsigned long long current_node_set = node_set & (~(1 << i));
                 solved_subproblems[i + 1][current_node_set] = solve_combination(i + 1, current_node_set);
@@ -235,7 +234,7 @@ int *solve_combination(int finish, unsigned long long node_set)
                 }
             }
         }
-        return solved_subproblems[finish][node_set]; // cost, parent, final vertex
+        return solved_subproblems[finish][node_set]; // cost, parent
     }
 }
 
@@ -248,7 +247,7 @@ pair<vector<int>, int> TSP_held_karp()
     for(int i = 0; i <number_of_current_graph_vertices; i++){
         solved_subproblems[i] = new int*[number_of_combinations];
         for(int j = 0; j < number_of_combinations; j++){
-            solved_subproblems[i][j] = new int[3]();
+            solved_subproblems[i][j] = new int[2]();
             solved_subproblems[i][j][0] = INT_MAX;
         }
     }
