@@ -159,27 +159,25 @@ void load_config()
     while (getline(fin, loaded_line_of_task))
     {
         vector<string> single_line = split(loaded_line_of_task, ' ');
-        string graph_file_name, test_type, number_of_repeats, shortest_path_weight, shortest_path;
-        if (single_line.size() >= 5)
+        string graph_file_name, number_of_repeats, shortest_path_weight, shortest_path;
+        if (single_line.size() >= 4)
         {
             graph_file_name = single_line[0];
-            test_type = single_line[1];
-            number_of_repeats = single_line[2];
-            shortest_path_weight = single_line[3];
-            for (long unsigned int i = 4; i < single_line.size(); i++)
+            number_of_repeats = single_line[1];
+            shortest_path_weight = single_line[2];
+            for (long unsigned int i = 3; i < single_line.size(); i++)
             {
                 shortest_path += single_line[i];
                 shortest_path += " ";
             }
         }
-        if (graph_file_name.size() == 0 || test_type.size() == 0 || number_of_repeats.size() == 0 || shortest_path_weight.size() == 0 || shortest_path.size() == 0)
+        if (graph_file_name.size() == 0|| number_of_repeats.size() == 0 || shortest_path_weight.size() == 0 || shortest_path.size() == 0)
         {
-            std::cout << "Cannot load this task: " << graph_file_name << " " << test_type << " " << number_of_repeats << " " << shortest_path_weight << " " << shortest_path;
+            std::cout << "Cannot load this task: " << graph_file_name << " " << number_of_repeats << " " << shortest_path_weight << " " << shortest_path;
             break;
         }
         vector<string> task;
         task.push_back(graph_file_name);
-        task.push_back(test_type);
         task.push_back(number_of_repeats);
         task.push_back(shortest_path_weight);
         task.push_back(shortest_path);
@@ -214,11 +212,13 @@ int *solve_combination(int finish, unsigned long long node_set)
     {
         return solved_subproblems[finish][node_set];
     }
-    else if(node_set == 0){
+    else if (node_set == 0)
+    {
         solved_subproblems[finish][node_set][0] = current_graph_adjacency_matrix.matrix[0][finish];
         solved_subproblems[finish][node_set][1] = 0;
         return solved_subproblems[finish][node_set];
-    }else
+    }
+    else
     {
         for (long unsigned int i = 0; i < sizeof(node_set) * 8; i++)
         {
@@ -243,10 +243,12 @@ pair<vector<int>, int> TSP_held_karp()
     vector<int> path;
     int weight;
     int number_of_combinations = pow(2, number_of_current_graph_vertices - 1);
-    solved_subproblems = new int**[number_of_current_graph_vertices];
-    for(int i = 0; i <number_of_current_graph_vertices; i++){
-        solved_subproblems[i] = new int*[number_of_combinations];
-        for(int j = 0; j < number_of_combinations; j++){
+    solved_subproblems = new int **[number_of_current_graph_vertices];
+    for (int i = 0; i < number_of_current_graph_vertices; i++)
+    {
+        solved_subproblems[i] = new int *[number_of_combinations];
+        for (int j = 0; j < number_of_combinations; j++)
+        {
             solved_subproblems[i][j] = new int[2]();
             solved_subproblems[i][j][0] = INT_MAX;
         }
@@ -264,8 +266,10 @@ pair<vector<int>, int> TSP_held_karp()
         temp_node_set = temp_node_set & (~(1 << (temp_solve[1] - 1)));
         temp_solve = solve_combination(temp_solve[1], temp_node_set);
     }
-    for(int i = 0; i <number_of_current_graph_vertices; i++){
-        for(int j = 0; j < number_of_combinations; j++){
+    for (int i = 0; i < number_of_current_graph_vertices; i++)
+    {
+        for (int j = 0; j < number_of_combinations; j++)
+        {
             delete solved_subproblems[i][j];
         }
         delete solved_subproblems[i];
@@ -290,10 +294,9 @@ int main()
                       << "##################################################" << endl
                       << endl;
             string graph_file_name = tasks[i][0];
-            string test_type = tasks[i][1];
-            int number_of_repeats = stoi(tasks[i][2]);
-            string shortest_path_weight = tasks[i][3];
-            string shortest_path = tasks[i][4];
+            int number_of_repeats = stoi(tasks[i][1]);
+            string shortest_path_weight = tasks[i][2];
+            string shortest_path = tasks[i][3];
             if (!load_data(graph_file_name))
             {
                 std::cout << "Cannot load graph from " << graph_file_name << " file." << endl;
